@@ -27,7 +27,7 @@ $ cd robot-nav-simulator/nav_ws
 $ catkin_make
 ```
 
-5. source setup.bash
+5. source `setup.bash`
 ```
 $ source devel/setup.bash
 ```
