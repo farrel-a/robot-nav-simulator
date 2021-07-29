@@ -37,6 +37,10 @@ $ source devel/setup.bash
 $ roslaunch navrobot_gazebo navrobot.launch
 ```
 
-7. The result will look like this. It will spawn turtlebot3_burger at x = 0.0, y = 0.0, z = 0.0
+**30 July 2021 Update-1**
+
+7. The result will look like this. It will spawn turtlebot3_burger at x = 0.0, y = 0.0, z = 0.0 and then go to (2.0 ; 2.0).
 
 ![](photos/launch.png)
+
+![](photos/move.gif)
