@@ -4,12 +4,20 @@
 #include "geometry_msgs/Quaternion.h"
 #include "std_msgs/Int8.h"
 #include "nav_msgs/Odometry.h"
-#include <tf/transform_datatypes.h>
+#include "tf/transform_datatypes.h"
+#include <math.h>
 
-double x; //global x robot
-double y; //global y robot
-double theta; //global theta robot (heading)
-geometry_msgs::Quaternion rot_q; //global rot_q robot (orienation_quaternion)
+
+//GLOBAL VARIABLES
+ros::Publisher pub;
+double x; //x robot
+double y; //y robot
+double theta; //theta robot (heading)
+geometry_msgs::Quaternion rot_q; //rot_q robot (orienation_quaternion)
+double goal_x; 
+double goal_y; 
+geometry_msgs::Twist speed;
+double angle_to_goal;
 
 void newOdom(const nav_msgs::Odometry& msg)
 {
@@ -34,18 +42,46 @@ void newOdom(const nav_msgs::Odometry& msg)
 
 int main (int argc, char **argv)
 {
+    //Node Definition
     //Node Name : robot_1
     ros::init(argc, argv, "robot_1"); //Initialize ROS
-    
     ros::NodeHandle nh; //create node
 
-    ros::Subscriber sub = nh.subscribe("/robot_1/odom", 2000, newOdom);
+    //Publisher & Subscriber Definition
+    ros::Subscriber sub = nh.subscribe("/robot_1/odom", 2000, newOdom); //odometry
+    pub = nh.advertise<geometry_msgs::Twist>("/robot_1/cmd_vel",2000);  //robot control
 
     ros::Rate loop_rate(1000); //1000 Hz 
 
+    goal_x = 2.0;
+    goal_y = 2.0;
+
+    double Dx;
+    double Dy; 
     while (ros::ok()) //SIGINT handler
     {
         ros::spinOnce();
+        Dx = goal_x - x;
+        Dy = goal_y - y;
+        angle_to_goal = atan2(Dy,Dx);
+
+        if ((angle_to_goal-theta) > 0.2)
+        {
+            speed.linear.x = 0.0;
+            speed.angular.z = 0.3;
+        }
+        else if ((angle_to_goal-theta) < -0.2)
+        {
+            speed.linear.x = 0.0;
+            speed.angular.z = -0.3;
+        }
+        else
+        {
+            speed.linear.x = 0.5;
+            speed.angular.z = 0.0;
+        }
+
+        pub.publish(speed);
         loop_rate.sleep();
     }
 
