@@ -3,7 +3,6 @@
 ## 16520373 / 13520110 - Farrel Ahmad
 
 ## Temporary Readme File
-<br>
 
 ### Robot Navigation Simulator using Gazebo Simulator with ROS (Robot Operating System). Tugas Challenge SPARTA HMIF 2020.
 
