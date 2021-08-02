@@ -60,7 +60,6 @@ int main (int argc, char **argv)
     double Dy; 
     while (ros::ok()) //SIGINT handler
     {
-        ros::spinOnce();
         Dx = goal_x - x;
         Dy = goal_y - y;
         angle_to_goal = atan2(Dy,Dx);
@@ -82,6 +81,7 @@ int main (int argc, char **argv)
         }
 
         pub.publish(speed);
+        ros::spinOnce();
         loop_rate.sleep();
     }
 
