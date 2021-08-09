@@ -9,21 +9,23 @@
 #include <climits>
 #include <vector>
 #include <bits/stdc++.h>
+#include "gazebo_msgs/SetModelState.h"
 
 
 //GLOBAL VARIABLES
 ros::Publisher pub;
+ros::ServiceClient clientSetModel;
 double x; //x robot
 double y; //y robot
 double theta; //theta robot (heading)
 geometry_msgs::Quaternion rot_q; //rot_q robot (orienation_quaternion)
 double goal_x; 
 double goal_y; 
-geometry_msgs::Twist speed;
-std::vector<int> path;
+geometry_msgs::Twist speed; //robot's speed (linear & angular) variable
+std::vector<int> path; //vertex path sequence
 
 /*
- Axes Colors
+ Axes Colors Reference in Gazebo
  X : RED Axis
  Y : GREEN Axis
  Z : BLUE Axis
@@ -61,7 +63,7 @@ double vpos[6][2] = {
 //FUNCTIONS AND PROCEDURES
 void newOdom(const nav_msgs::Odometry& msg)
 {
-    //set x,y, and rot_q from odometry
+    //update x,y, and rot_q from odometry msg
     x = msg.pose.pose.position.x;
     y = msg.pose.pose.position.y;
     rot_q = msg.pose.pose.orientation;
@@ -80,14 +82,14 @@ void newOdom(const nav_msgs::Odometry& msg)
     theta = Y;
 }
 
-int minimumDist(double dist[], bool Tset[]) 
+int minimumDist(double dist[], bool vis[]) 
 {
 	double min=std::numeric_limits<double>::infinity();
     int index;
               
 	for(int i=0;i<6;i++) 
 	{
-		if(Tset[i]==false && dist[i]<=min)      
+		if(!vis[i] && dist[i]<=min)      
 		{
 			min=dist[i];
 			index=i;
@@ -98,18 +100,18 @@ int minimumDist(double dist[], bool Tset[])
 
 int *dijkstra(double graph[6][6],int src) // adjacency matrix used is 6x6
 {
-	//dijkstra algo modified from https://www.educative.io/edpresso/how-to-implement-dijkstras-algorithm-in-cpp
+	//dijkstra algorithm modified from https://www.educative.io/edpresso/how-to-implement-dijkstras-algorithm-in-cpp
 
-    double dist[6]; // integer array to calculate minimum distance for each node.                            
-	bool Tset[6];// boolean array to mark visted/unvisted for each node.
-	static int prv[6];
-	// set the nodes with infinity distance
-	// except for the initial node and mark
-	// them unvisited.  
+    double dist[6];     // integer array of minimum distance for each node.                            
+	bool vis[6];        // boolean array of visited or unvisited
+	static int prv[6];  // previous vertex for each vertex to reach shortest path
+    int m;              // unvisited vertex index
+
+	// set all vertex distance as infinity
 	for(int i = 0; i<6; i++)
 	{
 		dist[i] = std::numeric_limits<double>::infinity();
-		Tset[i] = false;
+		vis[i] = false;
         prv[i] = -1;
 	}
 	
@@ -117,15 +119,15 @@ int *dijkstra(double graph[6][6],int src) // adjacency matrix used is 6x6
 	
 	for(int i = 0; i<6; i++)                           
 	{
-		int m=minimumDist(dist,Tset); // vertex not yet included.
-		Tset[m]=true;// m with minimum distance included in Tset.
+		m=minimumDist(dist,vis); // unvisited vertex
+		vis[m]=true;             // m with minimum distance included in vis.
 		for(int i = 0; i<6; i++)                  
 		{
-			// Updating the minimum distance for the particular node.
-			if(!Tset[i] && (graph[m][i] != 0.0) && dist[m]!=std::numeric_limits<double>::infinity() && dist[m]+graph[m][i]<dist[i])
+			// Updating the minimum distance for the particular vertex
+			if(!vis[i] && (graph[m][i] != 0.0) && dist[m]!=std::numeric_limits<double>::infinity() && dist[m]+graph[m][i]<dist[i])
 				{
-                    prv[i] = m;
-                    dist[i]=dist[m]+graph[m][i];
+                    prv[i] = m;  //set previous vertex
+                    dist[i]=dist[m]+graph[m][i]; //update distance
                 }
 		}
 	}
@@ -134,7 +136,10 @@ int *dijkstra(double graph[6][6],int src) // adjacency matrix used is 6x6
 
 std::vector<int> shortestpath(int src, int end)
 {
+    //Vertex Sequence of The Shortest Path
     int *prvs = dijkstra(graph, src);
+
+    //Vertex sequence from previous vertex of each vertex
     std::vector<int> a;
     int i;
     i = end;
@@ -150,6 +155,7 @@ std::vector<int> shortestpath(int src, int end)
 
 geometry_msgs::Twist speedcontrol(double goalx, double goaly, double x_pos, double y_pos, double tht)
 {
+    //Robot Speed Control to Goal
     double angle_to_goal;
     double Dx;
     double Dy;
@@ -178,6 +184,7 @@ geometry_msgs::Twist speedcontrol(double goalx, double goaly, double x_pos, doub
 
 void checkPos(double x_pos, double y_pos)
 {
+    //Check whether the robot has arrived at certain vertex
     if (((vpos[path[0]][0]-0.05 <= x_pos) && (x_pos <= vpos[path[0]][0]+0.05) 
          && (vpos[path[0]][1]-0.05 <= y_pos) && (y_pos <= vpos[path[0]][0]+0.05)) && path.size()!=0)
     {
@@ -191,16 +198,20 @@ void checkPos(double x_pos, double y_pos)
 //MAIN PROGRAM
 int main (int argc, char **argv)
 {
-    //Node Initialization
-    //Node Name : robot_1
+    //Node Initialization, Node Name : robot_1
     ros::init(argc, argv, "robot_1"); //Initialize ROS
-    ros::NodeHandle nh("~"); //Create node with ability to receive multiple rosrun arguments
+    ros::NodeHandle nh("~");          //Create node with ability to receive multiple rosrun arguments
 
-    //Source Vertex and End Vertex Argument Getter
+    //Source Vertex and End Vertex Argument Getter through rosrun
     int src;
     int end;
     nh.getParam("src", src);
     nh.getParam("end", end);
+    if (src<0 || src>5 || end<0 || end>5)
+    {
+        ROS_INFO("Invalid Argument! src and end must be 0<=(src,end)<=5");
+        ros::shutdown();
+    }
 
     //Subscriber Declaration and Assignment
     ros::Subscriber sub = nh.subscribe("/robot_1/odom", 2000, newOdom); //odometry
@@ -208,10 +219,20 @@ int main (int argc, char **argv)
     //Publisher Assignment
     pub = nh.advertise<geometry_msgs::Twist>("/robot_1/cmd_vel",2000);  //robot control
 
+    //Service Call Assignment
+    clientSetModel = nh.serviceClient<gazebo_msgs::SetModelState>("/gazebo/set_model_state");
+    gazebo_msgs::SetModelState robotState;
+    robotState.request.model_state.model_name = "robot_1";
+    robotState.request.model_state.pose.position.x = vpos[src][0];
+    robotState.request.model_state.pose.position.y = vpos[src][1];
+    clientSetModel.call(robotState);
+
     //Node Frequency 
     ros::Rate loop_rate(1000); //1000 Hz 
 
-    path = shortestpath(0, 5);
+    //Path Sequence
+    path = shortestpath(src, end);
+
     while (ros::ok()) //SIGINT handler
     {
         goal_x = vpos[path[0]][0];
