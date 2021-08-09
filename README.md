@@ -8,6 +8,17 @@
 
 <br>
 
+## Route Map
+**9 August 2021 Update-1**
+
+<br>
+
+![](photos/route.png)
+Route Map (Unit in Meters)
+
+
+<br>
+
 ## Launching World
 **29 July 2021 Update-1**
 1. This program is being developed using ROS Noetic, Gazebo 11, and Ubuntu 20.04 LTS. Try to use these version.
@@ -37,9 +48,19 @@ $ source devel/setup.bash
 $ roslaunch navrobot_gazebo navrobot.launch
 ```
 
-**30 July 2021 Update-1**
+**9 August 2021 Update-1**
 
-7. The result will look like this. It will spawn turtlebot3_burger at x = 0.0, y = 0.0, z = 0.0 and then go to (2.0 ; 2.0).
+7. start a new terminal and run this two commands
+```
+$ source devel/setup.bash
+$ rosrun navrobot_gazebo robot_1 _src:=0 _end:=5
+```
+
+8. The terminal will show GX and GY which are current Goal_X and Goal_Y respectively, X and Y which are current robot's x and y position.
+
+~~**30 July 2021 Update-1**~~
+
+9. The result will look like this. It will spawn turtlebot3_burger at x = 0.0, y = 0.0, z = 0.0 and then go to the nearest route from vertex A/0 to F/5
 
 ![](photos/launch.png)
 
