@@ -10,6 +10,7 @@
 #include <vector>
 #include <bits/stdc++.h>
 
+
 //GLOBAL VARIABLES
 ros::Publisher pub;
 double x; //x robot
@@ -21,14 +22,41 @@ double goal_y;
 geometry_msgs::Twist speed;
 std::vector<int> path;
 
-//GLOBAL WEIGHTED ADJACENCY MATRIX
-int graph[6][6]={
-		{0, 10, 20, 0, 0, 0},
-		{10, 0, 0, 50, 10, 0},
-		{20, 0, 0, 20, 33, 0},
-		{0, 50, 20, 0, 20, 2},
-		{0, 10, 33, 20, 0, 1},
-		{0, 0, 0, 2, 1, 0}};
+/*
+ Axes Colors
+ X : RED Axis
+ Y : GREEN Axis
+ Z : BLUE Axis
+ */
+
+//WEIGHTED ADJACENCY MATRIX GLOBAL VARIABLE
+double graph[6][6]={
+    {0.0, 2.5, 5.0, 0.0, 0.0, 0.0},
+    {2.5, 0.0, 0.0, 10.0, 7.825, 0.0},
+    {5.0, 0.0, 0.0, 7.8, 8.5, 0.0},
+    {0.0, 10.0, 7.8, 0.0, 5.05, 3.75},
+    {0.0, 7.825, 8.5, 5.05, 0.0, 2.0},
+    {0.0, 0.0, 0.0, 3.75, 2.0, 0.0}};
+
+/*
+VERTEX LOCATIONS
+Vertex : ( x , y )
+A/0 : (0.0 , 0.0)
+B/1 : (1.0 , -2.275)      
+C/2 : (4.55 , 2.076)   
+D/3 : (11.0 , -2.275)
+E/4 : (13.075 , 2.375)
+F/5 : (13.55 , 0.45)
+*/
+
+//VERTEX POSITION ARRAY GLOBAL VARIABLE
+double vpos[6][2] = {
+                    {0.0,  0.0},
+                    {1.0, -2.275},
+                    {4.55, 2.075},
+                    {11.0,-2.275},
+                    {13.075, 2.375},
+                    {13.55, 0.45}};
 
 //FUNCTIONS AND PROCEDURES
 void newOdom(const nav_msgs::Odometry& msg)
@@ -52,9 +80,10 @@ void newOdom(const nav_msgs::Odometry& msg)
     theta = Y;
 }
 
-int minimumDist(int dist[], bool Tset[]) 
+int minimumDist(double dist[], bool Tset[]) 
 {
-	int min=INT_MAX,index;
+	double min=std::numeric_limits<double>::infinity();
+    int index;
               
 	for(int i=0;i<6;i++) 
 	{
@@ -67,11 +96,11 @@ int minimumDist(int dist[], bool Tset[])
 	return index;
 }
 
-int *dijkstra(int graph[6][6],int src) // adjacency matrix used is 6x6
+int *dijkstra(double graph[6][6],int src) // adjacency matrix used is 6x6
 {
 	//dijkstra algo modified from https://www.educative.io/edpresso/how-to-implement-dijkstras-algorithm-in-cpp
 
-    int dist[6]; // integer array to calculate minimum distance for each node.                            
+    double dist[6]; // integer array to calculate minimum distance for each node.                            
 	bool Tset[6];// boolean array to mark visted/unvisted for each node.
 	static int prv[6];
 	// set the nodes with infinity distance
@@ -79,7 +108,7 @@ int *dijkstra(int graph[6][6],int src) // adjacency matrix used is 6x6
 	// them unvisited.  
 	for(int i = 0; i<6; i++)
 	{
-		dist[i] = INT_MAX;
+		dist[i] = std::numeric_limits<double>::infinity();
 		Tset[i] = false;
         prv[i] = -1;
 	}
@@ -93,7 +122,7 @@ int *dijkstra(int graph[6][6],int src) // adjacency matrix used is 6x6
 		for(int i = 0; i<6; i++)                  
 		{
 			// Updating the minimum distance for the particular node.
-			if(!Tset[i] && graph[m][i] && dist[m]!=INT_MAX && dist[m]+graph[m][i]<dist[i])
+			if(!Tset[i] && (graph[m][i] != 0.0) && dist[m]!=std::numeric_limits<double>::infinity() && dist[m]+graph[m][i]<dist[i])
 				{
                     prv[i] = m;
                     dist[i]=dist[m]+graph[m][i];
@@ -147,10 +176,22 @@ geometry_msgs::Twist speedcontrol(double goalx, double goaly, double x_pos, doub
     return spd;
 }
 
+void checkPos(double x_pos, double y_pos)
+{
+    if (((vpos[path[0]][0]-0.05 <= x_pos) && (x_pos <= vpos[path[0]][0]+0.05) 
+         && (vpos[path[0]][1]-0.05 <= y_pos) && (y_pos <= vpos[path[0]][0]+0.05)) && path.size()!=0)
+    {
+        reverse(path.begin(), path.end());
+        path.pop_back();
+        reverse(path.begin(), path.end());
+    }
+}
+
+
 //MAIN PROGRAM
 int main (int argc, char **argv)
 {
-    //Node Declaration
+    //Node Initialization
     //Node Name : robot_1
     ros::init(argc, argv, "robot_1"); //Initialize ROS
     ros::NodeHandle nh("~"); //Create node with ability to receive multiple rosrun arguments
@@ -167,17 +208,18 @@ int main (int argc, char **argv)
     //Publisher Assignment
     pub = nh.advertise<geometry_msgs::Twist>("/robot_1/cmd_vel",2000);  //robot control
 
-    //Frequency Definition
+    //Node Frequency 
     ros::Rate loop_rate(1000); //1000 Hz 
-
-    goal_x = 2.0;
-    goal_y = 2.0;
 
     path = shortestpath(0, 5);
     while (ros::ok()) //SIGINT handler
     {
+        goal_x = vpos[path[0]][0];
+        goal_y = vpos[path[0]][1];
         speed = speedcontrol(goal_x, goal_y, x, y, theta);
         pub.publish(speed);
+        checkPos(x,y);
+        ROS_INFO("GX:%.3f, GY:%.3f, X:%.3f, Y:%.3f", goal_x, goal_y, x, y);
         ros::spinOnce();
         loop_rate.sleep();
     }
