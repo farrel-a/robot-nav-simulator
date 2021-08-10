@@ -4,8 +4,16 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
+
     <include>
       <uri>model://sun</uri>
     </include>
+
+    <include>
+      <uri>model://dijkstra-route</uri>
+      <name>dijkstra_route</name>
+      <pose>7.548882961273193 0.05127263814210892 0 0 0 0</pose>
+    </include>
+
   </world>
 </sdf>
