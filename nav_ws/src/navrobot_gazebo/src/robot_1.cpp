@@ -194,6 +194,13 @@ void checkPos(double x_pos, double y_pos)
     }
 }
 
+char numtochar(int i)
+{
+    char a;
+    a = 65+i; //ASCII decimal conversion
+    return a;
+}
+
 
 //MAIN PROGRAM
 int main (int argc, char **argv)
@@ -235,12 +242,15 @@ int main (int argc, char **argv)
 
     while (ros::ok()) //SIGINT handler
     {
+        char vertex;
         goal_x = vpos[path[0]][0];
         goal_y = vpos[path[0]][1];
         speed = speedcontrol(goal_x, goal_y, x, y, theta);
         pub.publish(speed);
         checkPos(x,y);
-        ROS_INFO("GX:%.3f, GY:%.3f, X:%.3f, Y:%.3f", goal_x, goal_y, x, y);
+        vertex = numtochar(path[0]);
+        //ER : En Route
+        ROS_INFO("\n\nER:%c/%d, GX:%.3f, GY:%.3f, X:%.3f, Y:%.3f\n", vertex, path[0], goal_x, goal_y, x, y);
         ros::spinOnce();
         loop_rate.sleep();
     }
