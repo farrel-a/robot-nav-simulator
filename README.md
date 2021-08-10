@@ -85,3 +85,9 @@ $ rosrun navrobot_gazebo robot_1 _src:=0 _end:=5
 ![](photos/move.gif)
 
 11. Use ctrl+c on the terminal to stop the node. You can also try again and run the node with different argument value. Just redo the step no.8.
+
+**10 August 2021 Update-1**
+
+12. Now the world has a simple route model (true scale)
+
+![](photos/launch2.png)
