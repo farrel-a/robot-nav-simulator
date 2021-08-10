@@ -14,7 +14,7 @@
 
 This simulation utilizes dijkstra algorithm to find the shortest path from vertex to vertex. The algorithm is implemented in Gazebo Simulator using ROS Noetic with Turtlebot3 Burger as the robot. 
 
-Note that in this program, a node refers to a ROS Node while a vertex refers to a point (A or 0 for example) on the route map. Also, note that in this program's adjacency matrix, vertex A is 0, vertex B is 1, vertex C is 2, and so forth.
+Note that in this program, a node refers to a ROS Node while a vertex refers to a point (A or 0 for example) on the route map. Also, note that in this program's adjacency matrix, vertex A is 0, vertex B is 1, vertex C is 2, and so forth. The standard length unit in Gazebo Simulator is in meter.
 
 <br>
 
@@ -74,20 +74,32 @@ $ source devel/setup.bash
 $ rosrun navrobot_gazebo robot_1 _src:=0 _end:=5
 ```
 
-9. The robot will spawn at the `src`'s vertex position and the terminal will show GX and GY which are current Goal_X and Goal_Y respectively, X and Y which are current robot's x and y position.
+9. The robot will be spawned at `src`'s vertex position 
+
+**10 August 2021 Update-2**
+
+10. The terminal will show information as follows
+
+![](photos/terminal.png)
+
+- `ER` (En Route) : the vertex that the robot is currently going to.
+- `GX` (Goal_X) : x position of the current destinated vertex.
+- `GY` (Goal_Y) : y position of the current destinated vertex.
+- `X` : x position of the robot.
+- `Y` : y position of the robot.
 
 ~~**30 July 2021 Update-1**~~
 
-10. The result will look like this. It will spawn turtlebot3_burger at x = 0.0, y = 0.0, z = 0.0 and then go to the nearest route from vertex `src` to vertex `end`.
+11. The result will look like this. It will spawn turtlebot3_burger at x = 0.0, y = 0.0, z = 0.0 and then go to the nearest route from vertex `src` to vertex `end`.
 
 ![](photos/launch.png)
 
 ![](photos/move.gif)
 
-11. Use ctrl+c on the terminal to stop the node. You can also try again and run the node with different argument value. Just redo the step no.8.
+12. Use ctrl+c on the terminal to stop the node. You can also try again and run the node with different argument value. Just redo the step no.8.
 
 **10 August 2021 Update-1**
 
-12. Now the world has a simple route model (true scale)
+13. Now the world has a simple route model (true scale)
 
 ![](photos/launch2.png)
