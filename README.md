@@ -2,8 +2,6 @@
 
 ## 16520373 / 13520110 - Farrel Ahmad
 
-<br>
-
 ### Robot Shortest Path Navigation Simulator using Gazebo Simulator with ROS (Robot Operating System). Tugas Challenge SPARTA HMIF 2020.
 
 <br>
@@ -90,3 +88,14 @@ $ rosrun navrobot_gazebo robot_1 _src:=0 _end:=5
 ![](photos/move.gif)
 
 12. Use ctrl+c on the terminal to stop the node. You can also try again and run the node with different argument value. Just redo the step no.8.
+
+<br>
+
+## Reference
+- educative/Edpresso Team. 2021. *How to implement Dijkstra's Algorithm in C++*. https://www.educative.io/edpresso/how-to-implement-dijkstras-algorithm-in-cpp. Accessed on 9 August 2021.
+
+- WilliamFiset. 2018. *Dijkstra's Shortest Path Algorithm | Graph Theory*. https://www.youtube.com/watch?v=pSqmAO-m7Lk&t=785s. Accessed on 9 August 2021.
+
+- ROS.org. 2021. *ROS Documentation*. http://wiki.ros.org/. Accessed on 9 August 2021.
+
+- ROBOTIS. 2021. *ROBOTIS-GIT/turtlebot3*. https://github.com/ROBOTIS-GIT/turtlebot3. Accessed on 29 July 2021.
