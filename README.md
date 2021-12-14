@@ -2,11 +2,23 @@
 
 ## 16520373 / 13520110 - Farrel Ahmad
 
-### Robot Shortest Path Navigation Simulator using Gazebo Simulator with ROS (Robot Operating System). Tugas Challenge SPARTA HMIF 2020.
+### Robot Shortest Path Navigation Simulator using Gazebo Simulator with ROS (Robot Operating System). Tugas Challenge SPARTA HMIF 2020 & Paper Matematika Diskrit 2021
 
 <br>
 
-## Introduction
+## Table of Contents
+- [Introduction](#intro)
+- [Dijkstra Navigation](#DN)
+    - [Route Map (Dijkstra Navigation)](#DN)
+    - [Launching World (Dijkstra Route Map)](#LWRM)
+- [Dijkstra Obstacle Avoidance](#RMDO)
+    - [Route Map (Dijkstra Obstacle Avoidance)](#RMDO)
+    - [Launching World (Dijkstra Obstacle Avoidance)](#LWOA)
+- [References](#ref)
+
+<br>
+
+## Introduction <a name="intro"></a>
 
 This simulation utilizes dijkstra algorithm to find the shortest path from vertex to vertex. The algorithm is implemented in Gazebo Simulator using ROS Noetic with Turtlebot3 Burger as the robot. 
 
@@ -14,7 +26,7 @@ Note that in this program, a node refers to a ROS Node while a vertex refers to 
 
 <br>
 
-## Route Map
+## Route Map (Dijkstra Navigation)  <a name="DN"></a>
 
 <br>
 
@@ -30,7 +42,7 @@ Route Map on Gazebo Simulator
 
 <br>
 
-## Launching World
+## Launching World (Dijkstra Route Map) <a name="LWRM"></a>
 1. This program is being developed using ROS Noetic, Gazebo 11, and Ubuntu 20.04 LTS. Try to use these version.
 
 2. Clone the repository
@@ -48,9 +60,13 @@ $ cd robot-nav-simulator/nav_ws
 $ catkin_make
 ```
 
-5. source `setup.bash`
+5. source `setup.bash` for bash or `setup.zsh` for zsh
 ```
 $ source devel/setup.bash
+```
+or
+```
+$ source devel/setup.zsh
 ```
 
 6. run launch command
@@ -58,10 +74,15 @@ $ source devel/setup.bash
 $ roslaunch navrobot_gazebo navrobot.launch
 ```
 
-7. Start a new terminal and source setup.bash
+7. Start a new terminal and source `setup.bash` or `setup.zsh`
 ```
 $ source devel/setup.bash
 ```
+or
+```
+$ source devel/setup.zsh
+```
+
 
 8. On a new terminal, run this command and feel free to fill the argument with any value of `src` and `end`. `src` (source) is the starting vertex and `end` is the destination vertex. The value must be 0<=(`src`,`end`)<=5. For example, start at vertex 0/A and go to vertex 5/F.
 
@@ -90,8 +111,88 @@ $ rosrun navrobot_gazebo robot_1 _src:=0 _end:=5
 12. Use ctrl+c on the terminal to stop the node. You can also try again and run the node with different argument value. Just redo the step no.8.
 
 <br>
+<br>
 
-## Reference
+## Route Map (Dijkstra Obstacle Avoidance) <a name="RMDO"></a>
+![](https://i.ibb.co/jvXL87b/Screenshot-from-2021-12-14-07-01-20.png)
+
+Route Map
+
+<br>
+
+![](https://i.ibb.co/hsbZzYy/Screenshot-from-2021-12-14-07-41-20.png)
+
+Route Map (Expanded Obstacle)
+
+<br>
+
+## Launching World (Obstacle Avoidance)<a name="LWOA"></a>
+1. This program is being developed using ROS Noetic, Gazebo 11, and Ubuntu 20.04 LTS. Try to use these version.
+
+2. Clone the repository
+```
+$ git clone https://github.com/farrel-a/robot-nav-simulator.git
+```
+
+3. cd to `/robot-nav-simulator/nav_ws`
+```
+$ cd robot-nav-simulator/nav_ws
+```
+
+4. run `catkin_make`
+```
+$ catkin_make
+```
+
+5. source `setup.bash` for bash or `setup.zsh` for zsh
+```
+$ source devel/setup.bash
+```
+```
+$ source devel/setup.zsh
+```
+
+6. run launch command
+```
+$ roslaunch navrobot_gazebo obsrobot.launch
+```
+
+7. Start a new terminal and source `setup.bash` or `setup.zsh`
+```
+$ source devel/setup.bash
+```
+or
+```
+$ source devel/setup.zsh
+```
+
+8. On a new terminal, run this command to run the robot's program
+
+```
+$ rosrun navrobot_gazebo robot_2
+```
+
+9. The robot will be spawned at Node S vertex position (0.0, 0.0)
+
+![](https://i.ibb.co/6mvW4q5/Screenshot-from-2021-12-14-07-27-29.png)
+
+10. The terminal will show information as follows
+
+![](https://i.ibb.co/7KbGFX0/Screenshot-from-2021-12-14-12-37-56.png)
+
+`Prev List` : The nearest node of each node (from index-0 (Node S) to index-13 (Node GL))
+
+`Node Sequence` : Robot path sequence
+
+![](https://i.ibb.co/6wjNFpZ/robotobs.gif)
+
+Robot in Action!
+
+11. The node will stop automatically once arrived at the goal position (1.5, 1.5)
+
+<br>
+
+## Reference <a name="ref"></a>
 - educative/Edpresso Team. 2021. *How to implement Dijkstra's Algorithm in C++*. https://www.educative.io/edpresso/how-to-implement-dijkstras-algorithm-in-cpp. Accessed on 9 August 2021.
 
 - WilliamFiset. 2018. *Dijkstra's Shortest Path Algorithm | Graph Theory*. https://www.youtube.com/watch?v=pSqmAO-m7Lk&t=785s. Accessed on 9 August 2021.

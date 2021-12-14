@@ -139,6 +139,12 @@ std::vector<int> shortestpath(int src, int end)
     //Vertex Sequence of The Shortest Path
     int *prvs = dijkstra(graph, src);
 
+    for (int i = 0 ; i<6 ; i++)
+    {
+        std::cout<<prvs[i]<<" ";
+    }
+    std::cout<<""<<std::endl;
+
     //Vertex sequence from previous vertex of each vertex
     std::vector<int> a;
     int i;
@@ -239,6 +245,8 @@ int main (int argc, char **argv)
 
     //Path Sequence
     path = shortestpath(src, end);
+    
+
 
     while (ros::ok()) //SIGINT handler
     {
