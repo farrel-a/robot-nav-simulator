@@ -212,7 +212,7 @@ char numtochar(int i)
 int main (int argc, char **argv)
 {
     //Node Initialization, Node Name : robot_1
-    ros::init(argc, argv, "robot_1"); //Initialize ROS
+    ros::init(argc, argv, "robot_2"); //Initialize ROS
     ros::NodeHandle nh("~");          //Create node with ability to receive multiple rosrun arguments
 
     //Source Vertex and End Vertex Argument Getter through rosrun
