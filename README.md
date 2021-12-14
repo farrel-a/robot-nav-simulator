@@ -10,7 +10,7 @@
 - [Introduction](#intro)
 - [Dijkstra Navigation](#DN)
     - [Route Map (Dijkstra Navigation)](#DN)
-    - [Launching World (Dijkstra Route Map)](#LWRM)
+    - [Launching World (Dijkstra Navigation)](#LWRM)
 - [Dijkstra Obstacle Avoidance](#RMDO)
     - [Route Map (Dijkstra Obstacle Avoidance)](#RMDO)
     - [Launching World (Dijkstra Obstacle Avoidance)](#LWOA)
@@ -42,7 +42,7 @@ Route Map on Gazebo Simulator
 
 <br>
 
-## Launching World (Dijkstra Route Map) <a name="LWRM"></a>
+## Launching World (Dijkstra Navigation) <a name="LWRM"></a>
 1. This program is being developed using ROS Noetic, Gazebo 11, and Ubuntu 20.04 LTS. Try to use these version.
 
 2. Clone the repository
@@ -192,7 +192,7 @@ Robot in Action!
 
 <br>
 
-## Reference <a name="ref"></a>
+## References <a name="ref"></a>
 - educative/Edpresso Team. 2021. *How to implement Dijkstra's Algorithm in C++*. https://www.educative.io/edpresso/how-to-implement-dijkstras-algorithm-in-cpp. Accessed on 9 August 2021.
 
 - WilliamFiset. 2018. *Dijkstra's Shortest Path Algorithm | Graph Theory*. https://www.youtube.com/watch?v=pSqmAO-m7Lk&t=785s. Accessed on 9 August 2021.
