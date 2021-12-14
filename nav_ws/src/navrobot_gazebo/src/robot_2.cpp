@@ -14,7 +14,7 @@
 
 //GLOBAL VARIABLES
 ros::Publisher pub;
-ros::ServiceClient clientSetModel;
+ros::ServiceClient clientSetModelState;
 double x; //x robot
 double y; //y robot
 double theta; //theta robot (heading)
@@ -23,6 +23,11 @@ double goal_x;
 double goal_y; 
 geometry_msgs::Twist speed; //robot's speed (linear & angular) variable
 std::vector<int> path; //vertex path sequence
+std::string a[14];
+
+//ROBOT GLOBAL CONFIG
+double speed_linear = 0.3;
+double speed_angular = 0.2;
 
 /*
  Axes Colors Reference in Gazebo
@@ -31,34 +36,63 @@ std::vector<int> path; //vertex path sequence
  Z : BLUE Axis
  */
 
-//WEIGHTED ADJACENCY MATRIX GLOBAL VARIABLE
-double graph[6][6]={
-    {0.0, 2.5, 5.0, 0.0, 0.0, 0.0},
-    {2.5, 0.0, 0.0, 10.0, 12.9, 0.0},
-    {5.0, 0.0, 0.0, 7.8, 8.5, 0.0},
-    {0.0, 10.0, 7.8, 0.0, 5.05, 3.75},
-    {0.0, 12.9, 8.5, 5.05, 0.0, 2.0},
-    {0.0, 0.0, 0.0, 3.75, 2.0, 0.0}};
+//WEIGHTED ADJACENCY MATRIX GLOBAL VARIABLE (Expanded Obstacle)
+double graph[14][14]={
+/*S*/ {0.0, 0.5, 0.7, 0.8, 0.0, 1.3, 1.5, 0.0, 0.0, 0.0, 0.0, 1.4, 0.0, 0.0},
+/*C*/ {0.5, 0.0, 0.3, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+/*D*/ {1.3, 0.3, 0.0, 0.0, 0.3, 0.5, 0.8, 0.7, 0.0, 0.0, 0.7, 0.0, 0.0, 1.4},
+/*A*/ {0.8, 0.3, 0.0, 0.0, 0.3, 0.0, 0.0, 0.8, 0.0, 0.4, 0.6, 0.7, 0.0, 0.0},
+/*B*/ {0.0, 0.0, 0.3, 0.3, 0.0, 0.5, 0.0, 0.5, 0.0, 0.4, 0.4, 0.0, 0.0, 1.2},
+/*G*/ {1.3, 0.0, 0.5, 0.0, 0.5, 0.0, 0.3, 0.3, 0.0, 0.8, 0.5, 0.0, 0.9, 0.0},
+/*H*/ {1.5, 0.0, 0.8, 0.0, 0.0, 0.3, 0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0},
+/*E*/ {0.0, 0.0, 0.7, 0.0, 0.5, 0.3, 0.0, 0.0, 0.3, 0.7, 0.4, 0.0, 0.5, 0.7},
+/*F*/ {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.3, 0.0, 0.9, 0.7, 0.0, 0.8, 0.6},
+/*I*/ {0.0, 0.0, 0.0, 0.4, 0.4, 0.8, 0.0, 0.7, 0.9, 0.0, 0.3, 0.3, 0.0, 0.0},
+/*J*/ {0.0, 0.0, 0.0, 0.6, 0.4, 0.5, 0.0, 0.4, 0.7, 0.3, 0.0, 0.0, 0.3, 0.9},
+/*K*/ {1.4, 0.0, 0.0, 0.7, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.0, 0.0, 0.3, 1.1},
+/*L*/ {0.0, 0.0, 0.0, 0.0, 0.0, 0.8, 0.0, 0.5, 0.8, 0.0, 0.3, 0.3, 0.0, 0.8},
+/*GL*/{0.0, 0.0, 1.4, 0.0, 1.2, 0.0, 0.0, 0.7, 0.6, 0.0, 0.9, 1.1, 0.8, 0.0}
+//      S    C    D    A    B    G    H    E    F     I    J    K    L   GL
+};
+
+std::string node[14] = {"S","C","D","A","B","G","H","E","F","I","J","K","L","GL"};
 
 /*
 VERTEX LOCATIONS
-Vertex : ( x , y )
-A/0 : (0.0 , 0.0)
-B/1 : (1.0 , -2.275)      
-C/2 : (4.55 , 2.076)   
-D/3 : (11.0 , -2.275)
-E/4 : (13.075 , 2.375)
-F/5 : (13.55 , 0.45)
+Vertex/Num : ( x , y ) --> d = degree
+S/0 : (0.0 , 0.0)   --> START, d(S) = 6
+C/1 : (0.3 , 0.4) --> d(C) = 3
+D/2 : (0.6, 0.4) --> d(D) = 8
+A/3 : (0.3, 0.7) --> d(A) = 7
+B/4 : (0.6, 0.7) --> d(B) = 7
+G/5 : (1.1, 0.6) --> d(G) = 8
+H/6 : (1.4, 0.6) --> d(H) = 4
+E/7 : (1.1, 0.9) --> d(E) = 9
+F/8 : (1.4, 0.9) --> d(F) = 6
+I/9 : (0.5, 1.0) --> d(I) = 7
+J/10 : (0.8, 1.0) --> d(J) = 9
+K/11 : (0.5, 1.3) --> d(K) = 5
+L/12 : (0.8, 1.3) --> d(L) = 6
+GL/13 : (1.5, 1.5) --> GOAL --> d(GL) = 7 
 */
 
 //VERTEX POSITION ARRAY GLOBAL VARIABLE
-double vpos[6][2] = {
-                    {0.0,  0.0},
-                    {1.0, -2.275},
-                    {4.55, 2.075},
-                    {11.0,-2.275},
-                    {13.075, 2.375},
-                    {13.55, 0.45}};
+double vpos[14][2] = {
+                    {0.0, 0.0},
+                    {0.3, 0.4},
+                    {0.6, 0.4},
+                    {0.3, 0.7},
+                    {0.6, 0.7},
+                    {1.1, 0.6},
+                    {1.4, 0.6},
+                    {1.1, 0.9},
+                    {1.4, 0.9},
+                    {0.5, 1.0},
+                    {0.8, 1.0},
+                    {0.5, 1.3},
+                    {0.8, 1.3},
+                    {1.5, 1.5}
+                    };
 
 //FUNCTIONS AND PROCEDURES
 void newOdom(const nav_msgs::Odometry& msg)
@@ -85,9 +119,9 @@ void newOdom(const nav_msgs::Odometry& msg)
 int minimumDist(double dist[], bool vis[]) 
 {
 	double min=std::numeric_limits<double>::infinity();
-    int index;
+    int index,i;
               
-	for(int i=0;i<6;i++) 
+	for(i=0;i<14;i++) 
 	{
 		if(!vis[i] && dist[i]<=min)      
 		{
@@ -98,30 +132,30 @@ int minimumDist(double dist[], bool vis[])
 	return index;
 }
 
-int *dijkstra(double graph[6][6],int src) // adjacency matrix used is 6x6
+int *dijkstra(double graph[14][14], int src) // adjacency matrix is 14x14
 {
-	//dijkstra algorithm modified from https://www.educative.io/edpresso/how-to-implement-dijkstras-algorithm-in-cpp
+	//dijkstra algorithm implementation modified from https://www.educative.io/edpresso/how-to-implement-dijkstras-algorithm-in-cpp
 
-    double dist[6];     // integer array of minimum distance for each node.                            
-	bool vis[6];        // boolean array of visited or unvisited
-	static int prv[6];  // previous vertex for each vertex to reach shortest path
+    double dist[14];     // integer array of minimum distance for each node.                            
+	bool vis[14];        // boolean array of visited or unvisited
+	static int prv[14];  // previous vertex for each vertex to reach shortest path
     int m;              // unvisited vertex index
 
-	// set all vertex distance as infinity
-	for(int i = 0; i<6; i++)
+	// set all vertex distance as infinity, all vis as false, and all prv elem as -1
+	for(int i = 0; i<14; i++)
 	{
 		dist[i] = std::numeric_limits<double>::infinity();
 		vis[i] = false;
         prv[i] = -1;
 	}
 	
-	dist[src] = 0;   // Source vertex distance is set to zero.             
+	dist[src] = 0;   // source vertex distance is set to zero.             
 	
-	for(int i = 0; i<6; i++)                           
+	for(int i = 0; i<14; i++)                           
 	{
-		m=minimumDist(dist,vis); // unvisited vertex
+		m=minimumDist(dist,vis); // find minimum in list dist and must be unvisited vertex
 		vis[m]=true;             // m with minimum distance included in vis.
-		for(int i = 0; i<6; i++)                  
+		for(int i = 0; i<14; i++)                  
 		{
 			// Updating the minimum distance for the particular vertex
 			if(!vis[i] && (graph[m][i] != 0.0) && dist[m]!=std::numeric_limits<double>::infinity() && dist[m]+graph[m][i]<dist[i])
@@ -134,16 +168,36 @@ int *dijkstra(double graph[6][6],int src) // adjacency matrix used is 6x6
     return prv;
 }
 
+void printList(int list[], int size)
+{
+    std::cout<<"Prev List: ";
+    for (int i = 0 ; i<size ; i++)
+    {
+        std::cout<<list[i]<<" ";
+    }
+    std::cout<<""<<std::endl;
+}
+
+void printSequence(std::vector<int> list, int size)
+{
+    std::cout<<"Node Sequence : ";
+    for (int i = 0; i<size ; i++)
+    {
+        std::cout<<node[list[i]];
+        if (i!=size-1)
+        {
+            std::cout<<" --> ";
+        }
+    }
+    std::cout<<std::endl;
+}
+
 std::vector<int> shortestpath(int src, int end)
 {
     //Vertex Sequence of The Shortest Path
     int *prvs = dijkstra(graph, src);
 
-    for (int i = 0 ; i<6 ; i++)
-    {
-        std::cout<<prvs[i]<<" ";
-    }
-    std::cout<<""<<std::endl;
+    printList(prvs, 14);
 
     //Vertex sequence from previous vertex of each vertex
     std::vector<int> a;
@@ -156,6 +210,7 @@ std::vector<int> shortestpath(int src, int end)
         i = prvs[i];
     }
     reverse(a.begin(), a.end());
+    printSequence(a, a.size());
     return a;  
 }
 
@@ -170,19 +225,24 @@ geometry_msgs::Twist speedcontrol(double goalx, double goaly, double x_pos, doub
     angle_to_goal = atan2(Dy,Dx);
     geometry_msgs::Twist spd;
 
-    if ((angle_to_goal-tht) > 0.2)
+    if ((angle_to_goal-tht) > 0.2) //rotate left
     {
         spd.linear.x = 0.0;
-        spd.angular.z = 0.3;
+        spd.angular.z = speed_angular;
     }
-    else if ((angle_to_goal-tht) < -0.2)
+    else if ((angle_to_goal-tht) < -0.2)  //rotate right
     {
         spd.linear.x = 0.0;
-        spd.angular.z = -0.3;
+        spd.angular.z = -speed_angular;
     }
-    else
+    else if (path.size() != 0)  //forward
     {
-        spd.linear.x = 0.5;
+        spd.linear.x = speed_linear;
+        spd.angular.z = 0.0;
+    }
+    else //arrived
+    {
+        spd.linear.x = 0.0;
         spd.angular.z = 0.0;
     }
     return spd;
@@ -198,6 +258,11 @@ void checkPos(double x_pos, double y_pos)
         path.pop_back();
         reverse(path.begin(), path.end());
     }
+    else if (path.size() == 0)
+    {
+        std::cout<<"Robot has arrived at goal (1.5, 1.5)"<<std::endl;
+        exit(0);
+    }
 }
 
 char numtochar(int i)
@@ -211,42 +276,34 @@ char numtochar(int i)
 //MAIN PROGRAM
 int main (int argc, char **argv)
 {
-    //Node Initialization, Node Name : robot_1
+    //Node Initialization, Node Name : robot_2
     ros::init(argc, argv, "robot_2"); //Initialize ROS
     ros::NodeHandle nh("~");          //Create node with ability to receive multiple rosrun arguments
 
     //Source Vertex and End Vertex Argument Getter through rosrun
-    int src;
-    int end;
-    nh.getParam("src", src);
-    nh.getParam("end", end);
-    if (src<0 || src>5 || end<0 || end>5)
-    {
-        ROS_INFO("Invalid Argument! src and end must be 0<=(src,end)<=5");
-        ros::shutdown();
-    }
+    int src = 0;
+    int end = 13;
 
     //Subscriber Declaration and Assignment
-    ros::Subscriber sub = nh.subscribe("/robot_1/odom", 2000, newOdom); //odometry
+    ros::Subscriber sub = nh.subscribe("/robot_1/odom", 20, newOdom); //odometry
 
     //Publisher Assignment
-    pub = nh.advertise<geometry_msgs::Twist>("/robot_1/cmd_vel",2000);  //robot control
+    pub = nh.advertise<geometry_msgs::Twist>("/robot_1/cmd_vel",20);  //robot control
 
     //Service Call Assignment
-    clientSetModel = nh.serviceClient<gazebo_msgs::SetModelState>("/gazebo/set_model_state");
+    clientSetModelState = nh.serviceClient<gazebo_msgs::SetModelState>("/gazebo/set_model_state");
     gazebo_msgs::SetModelState robotState;
     robotState.request.model_state.model_name = "robot_1";
     robotState.request.model_state.pose.position.x = vpos[src][0];
     robotState.request.model_state.pose.position.y = vpos[src][1];
-    clientSetModel.call(robotState);
+    clientSetModelState.call(robotState);
 
     //Node Frequency 
-    ros::Rate loop_rate(1000); //1000 Hz 
+    ros::Rate loop_rate(100); //100 Hz 
 
     //Path Sequence
     path = shortestpath(src, end);
     
-
 
     while (ros::ok()) //SIGINT handler
     {
@@ -256,9 +313,6 @@ int main (int argc, char **argv)
         speed = speedcontrol(goal_x, goal_y, x, y, theta);
         pub.publish(speed);
         checkPos(x,y);
-        vertex = numtochar(path[0]);
-        //ER : En Route
-        ROS_INFO("\n\nER:%c/%d, GX:%.3f, GY:%.3f, X:%.3f, Y:%.3f\n", vertex, path[0], goal_x, goal_y, x, y);
         ros::spinOnce();
         loop_rate.sleep();
     }
