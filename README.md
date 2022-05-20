@@ -2,18 +2,31 @@
 
 ## 16520373 / 13520110 - Farrel Ahmad
 
-### Robot Shortest Path Navigation Simulator using Gazebo Simulator with ROS (Robot Operating System). Tugas Challenge SPARTA HMIF 2020 & Paper Matematika Diskrit 2021
+### Robot Shortest Path Navigation Simulator using Gazebo Simulator with ROS (Robot Operating System). 
+### Tugas Challenge SPARTA HMIF 2020 
+### Paper Matematika Diskrit 2021
+### Paper Strategi Algoritma 2022
 
 <br>
 
 ## Table of Contents
 - [Introduction](#intro)
+
+Tugas Challenge SPARTA HMIF 2020
 - [Dijkstra Navigation](#DN)
     - [Route Map (Dijkstra Navigation)](#DN)
     - [Launching World (Dijkstra Navigation)](#LWRM)
+
+Paper Matematika Diskrit 2021
 - [Dijkstra Obstacle Avoidance](#RMDO)
     - [Route Map (Dijkstra Obstacle Avoidance)](#RMDO)
     - [Launching World (Dijkstra Obstacle Avoidance)](#LWOA)
+
+Paper Strategi Algoritma 2022
+- [Proportional Controller Motion Planner](#PCON)
+    - [Launching World (P-Controller Motion Planner)](#LWPCON)
+
+
 - [References](#ref)
 
 <br>
@@ -192,6 +205,71 @@ Robot in Action!
 
 <br>
 
+## Proportional Controller Motion Planner <a name="PCON"></a>
+
+<br>
+
+## Launching World (P-Controller Motion Planner) <a name="LWPCON"></a>
+![](photos/pconWorld.png)
+
+one tile = 1m x 1m
+
+1. This program is being developed using ROS Noetic, Gazebo 11, and Ubuntu 20.04 LTS. Try to use these version.
+
+2. Clone the repository
+```
+$ git clone https://github.com/farrel-a/robot-nav-simulator.git
+```
+
+3. cd to `/robot-nav-simulator/nav_ws`
+```
+$ cd robot-nav-simulator/nav_ws
+```
+
+4. run `catkin_make`
+```
+$ catkin_make
+```
+
+5. source `setup.bash` for bash or `setup.zsh` for zsh
+```
+$ source devel/setup.bash
+```
+```
+$ source devel/setup.zsh
+```
+
+6. run launch command
+```
+$ roslaunch navrobot_gazebo PConRobot.launch
+```
+
+7. Start a new terminal and source `setup.bash` or `setup.zsh`
+```
+$ source devel/setup.bash
+```
+or
+```
+$ source devel/setup.zsh
+```
+
+8. On a new terminal, run this command to run the robot's program
+
+```
+$ rosrun navrobot_gazebo robot_3 _x_goal:=1.0 _y_goal:=1.0 _Kp_lin:=0.35 _Kp_rot:=0.45
+```
+
+9. _x_goal, _y_goal can also be changed to other position. _Kp_lin is a Kp constant for linear velocity and _Kp_rot is Kp constant for angular velocity. _Kp_lin and _Kp_rot can also be changed.
+
+10. The terminal will show GX (Goal X), GY (Goal Y), current X, and current Y pose of the robot.
+
+![](photos/terminal2.png)
+
+11. IN ACTION !!!
+
+![](photos/pcon.gif)
+
+
 ## References <a name="ref"></a>
 - educative/Edpresso Team. 2021. *How to implement Dijkstra's Algorithm in C++*. https://www.educative.io/edpresso/how-to-implement-dijkstras-algorithm-in-cpp. Accessed on 9 August 2021.
 
@@ -200,3 +278,5 @@ Robot in Action!
 - ROS.org. 2021. *ROS Documentation*. http://wiki.ros.org/. Accessed on 9 August 2021.
 
 - ROBOTIS. 2021. *ROBOTIS-GIT/turtlebot3*. https://github.com/ROBOTIS-GIT/turtlebot3. Accessed on 29 July 2021.
+
+- Shikin Zhang. 2016. *PID Pseudocode*. https://shikinzhang.github.io/2016/07/25/PD-Controller/. Accessed on 21 May 2022.
