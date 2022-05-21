@@ -14,13 +14,13 @@
 
 Tugas Challenge SPARTA HMIF 2020
 - [Dijkstra Navigation](#DN)
-    - [Route Map (Dijkstra Navigation)](#DN)
-    - [Launching World (Dijkstra Navigation)](#LWRM)
+    - [Route Map (Dijkstra Navigation Path Planner)](#DN)
+    - [Launching World (Dijkstra Navigation Path Planner)](#LWRM)
 
 Paper Matematika Diskrit 2021
 - [Dijkstra Obstacle Avoidance](#RMDO)
-    - [Route Map (Dijkstra Obstacle Avoidance)](#RMDO)
-    - [Launching World (Dijkstra Obstacle Avoidance)](#LWOA)
+    - [Route Map (Dijkstra Obstacle Avoidance Path Planner)](#RMDO)
+    - [Launching World (Dijkstra Obstacle Avoidance Path Planner)](#LWOA)
 
 Paper Strategi Algoritma 2022
 - [Proportional Controller Motion Planner](#PCON)
@@ -41,7 +41,7 @@ For motion planner program. The program utilizes Proportional Controller algorit
 
 <br>
 
-## Route Map (Dijkstra Navigation)  <a name="DN"></a>
+## Route Map (Dijkstra Navigation Path Planner)  <a name="DN"></a>
 
 <br>
 
@@ -57,7 +57,7 @@ Route Map on Gazebo Simulator
 
 <br>
 
-## Launching World (Dijkstra Navigation) <a name="LWRM"></a>
+## Launching World (Dijkstra Navigation Path Planner) <a name="LWRM"></a>
 1. This program is being developed using ROS Noetic, Gazebo 11, and Ubuntu 20.04 LTS. Try to use these version.
 
 2. Clone the repository
@@ -128,7 +128,7 @@ $ rosrun navrobot_gazebo robot_1 _src:=0 _end:=5
 <br>
 <br>
 
-## Route Map (Dijkstra Obstacle Avoidance) <a name="RMDO"></a>
+## Route Map (Dijkstra Obstacle Avoidance Path Planner) <a name="RMDO"></a>
 ![](https://i.ibb.co/jvXL87b/Screenshot-from-2021-12-14-07-01-20.png)
 
 Route Map
@@ -141,7 +141,7 @@ Route Map (Expanded Obstacle)
 
 <br>
 
-## Launching World (Obstacle Avoidance)<a name="LWOA"></a>
+## Launching World (Obstacle Avoidance Path Planner)<a name="LWOA"></a>
 1. This program is being developed using ROS Noetic, Gazebo 11, and Ubuntu 20.04 LTS. Try to use these version.
 
 2. Clone the repository
