@@ -2,7 +2,7 @@
 
 ## 16520373 / 13520110 - Farrel Ahmad
 
-### Robot Shortest Path Navigation Simulator using Gazebo Simulator with ROS (Robot Operating System). 
+### Robot Navigation Simulator using Gazebo Simulator with ROS (Robot Operating System). 
 ### Tugas Challenge SPARTA HMIF 2020 
 ### Paper Matematika Diskrit 2021
 ### Paper Strategi Algoritma 2022
