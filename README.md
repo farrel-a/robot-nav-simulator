@@ -33,9 +33,11 @@ Paper Strategi Algoritma 2022
 
 ## Introduction <a name="intro"></a>
 
-This simulation utilizes dijkstra algorithm to find the shortest path from vertex to vertex. The algorithm is implemented in Gazebo Simulator using ROS Noetic with Turtlebot3 Burger as the robot. 
+This simulation is a base for robot navigation simulation. There are two main navigation functionality implemented in the simulator, path planner (dijkstra), and motion planner (P-Controller). The algorithm is implemented in Gazebo Simulator using ROS Noetic with Turtlebot3 Burger as the robot. 
 
-Note that in this program, a node refers to a ROS Node while a vertex refers to a point (A or 0 for example) on the route map. Also, note that in this program's adjacency matrix, vertex A is 0, vertex B is 1, vertex C is 2, and so forth. The standard length unit in Gazebo Simulator is in meter.
+Note that in this path planner program, a node refers to a ROS Node while a vertex refers to a point (A or 0 for example) on the route map. Also, note that in this program's adjacency matrix, vertex A is 0, vertex B is 1, vertex C is 2, and so forth. The standard length unit in Gazebo Simulator is in meter.
+
+For motion planner program. The program utilizes Proportional Controller algorithm to generate velocity command to the robot as a step by step velocity to reach certain position.
 
 <br>
 
